@@ -1,14 +1,8 @@
-import { MOVE, MoveKeys } from "../constants";
-import { Tetrominoe } from "../store/tetrominoes";
+import { DIRECTION, Move } from "../constants/Movement";
+import { TETROMINOES, Tetrominoe } from "../constants/Tetrominoe";
+import { Coord, Coords } from "../types";
 
-type Coord = [number, number];
-
-export function pickRandomTetrominoe(
-    Tetrominoes: Array<Tetrominoe>
-): Tetrominoe {
-    const randIdx = Math.floor(Math.random() * 10) % Tetrominoes.length;
-    return Tetrominoes[randIdx]!;
-}
+type ValidateFn = (tetrominoe: Tetrominoe) => boolean;
 
 function localToGlobalCoord(localCoord: Coord, globalCoord: Coord): Coord {
     const [localX, localY] = localCoord;
@@ -16,11 +10,8 @@ function localToGlobalCoord(localCoord: Coord, globalCoord: Coord): Coord {
     return [localX + globalX, localY + globalY];
 }
 
-export function localToGlobalCoords(
-    localCoords: Tetrominoe["coords"],
-    globalPoint: Coord
-): Tetrominoe["coords"] {
-    const globalCoords: Tetrominoe["coords"] = [];
+function getGlobalCoords(localCoords: Coords, globalPoint: Coord): Coords {
+    const globalCoords: Coords = [];
 
     for (const coords of localCoords) {
         const localCoords = coords.map((local) =>
@@ -32,34 +23,62 @@ export function localToGlobalCoords(
     return globalCoords;
 }
 
-function moveCoords(coord: Coord, direction: MoveKeys): Coord {
+function moveCoord(coord: Coord, direction: Move): Coord {
     const [x, y] = coord;
 
-    if (direction === MOVE.DOWN) return [x + 1, y];
-    if (direction === MOVE.LEFT) return [x, y - 1];
-    if (direction === MOVE.RIGHT) return [x, y + 1];
+    if (direction === DIRECTION.DOWN) return [x + 1, y];
+    if (direction === DIRECTION.LEFT) return [x, y - 1];
+    if (direction === DIRECTION.RIGHT) return [x, y + 1];
 
     return [x, y];
 }
 
-export function moveTetronoe(
-    direction: MoveKeys,
-    coords: Tetrominoe["coords"]
-): Tetrominoe["coords"] {
-    const newCoords: Tetrominoe["coords"] = [];
+function getRandomTetrominoeInPos(
+    point: Coord,
+    validate: ValidateFn
+): Tetrominoe | undefined {
+    const randIdx = Math.floor(Math.random() * 10) % TETROMINOES.length;
 
-    for (const coord of coords) {
-        const movedCoords = coord.map((coord) => moveCoords(coord, direction));
-        newCoords.push(movedCoords);
+    const tetrominoe = TETROMINOES[randIdx]!;
+    tetrominoe.coords = getGlobalCoords(tetrominoe.coords, point);
+
+    if (!validate(tetrominoe)) return;
+
+    return tetrominoe;
+}
+
+function getMovedTetrominoe(
+    tetrominoe: Tetrominoe,
+    direction: Move,
+    validate: ValidateFn
+): Tetrominoe | undefined {
+    const movedTetrominoe: Tetrominoe = { ...tetrominoe, coords: [] };
+
+    for (const coord of tetrominoe.coords) {
+        const movedCoords = coord.map((coord) => moveCoord(coord, direction));
+        movedTetrominoe.coords.push(movedCoords);
     }
 
-    return newCoords;
+    if (!validate(movedTetrominoe)) return;
+
+    return movedTetrominoe;
 }
 
-export function rotateTetronoe(
-    coord: Tetrominoe["coords"]
-): Tetrominoe["coords"] {
-    const newCoord = [...coord];
+function getRotatedTetrominoe(
+    tetrominoe: Tetrominoe,
+    validate: ValidateFn
+): Tetrominoe | undefined {
+    const increasedCurrentCoords =
+        (tetrominoe.currentCoords + 1) % tetrominoe.coords.length;
 
-    return newCoord;
+    const rotatedTetrominoe: Tetrominoe = {
+        ...tetrominoe,
+        currentCoords: increasedCurrentCoords,
+    };
+
+    if (!validate(rotatedTetrominoe)) return;
+
+    return rotatedTetrominoe;
 }
+
+export { getRandomTetrominoeInPos, getMovedTetrominoe, getRotatedTetrominoe };

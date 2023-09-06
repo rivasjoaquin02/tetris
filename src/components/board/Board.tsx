@@ -19,7 +19,7 @@ function BoardRow({ cells }: { cells: Array<string> }) {
 }
 
 function Board() {
-    const board = useGame((s) => s.board);
+    const { board } = useGame((s) => s.state);
 
     return (
         <div className="board">

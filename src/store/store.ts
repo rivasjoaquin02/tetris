@@ -1,78 +1,107 @@
 import { create } from "zustand";
 
-import { Color } from "../types";
-import { MoveKeys } from "../constants";
-import { TETROMINOES, Tetrominoe } from "./tetrominoes";
-import { createBoard, addTetrominoeToBoard } from "../utils/board";
+// Board
+import { Board } from "../types";
+import { createBoard, getUpdatedBoard, validate } from "../utils/board";
+import { COLS, ROWS, START_POSITION } from "../constants/Board";
+
+// Tetrominoe
 import {
-    pickRandomTetrominoe,
-    localToGlobalCoords,
-    moveTetronoe,
+    getRandomTetrominoeInPos,
+    getMovedTetrominoe,
+    getRotatedTetrominoe,
 } from "../utils/tetrominoes";
+import { Tetrominoe } from "../constants/Tetrominoe";
 
-const COLS = 10;
-const ROWS = 20;
-const SPAWN_IDX: [number, number] = [0, 4];
+// Movement
+import { DIRECTION, Move } from "../constants/Movement";
 
-export type Board = Array<Array<Color>>;
-
-export const useGame = create<{
+type GameState = {
     board: Board;
     currentTetrominoe: Tetrominoe | undefined;
+};
+
+export const useGame = create<{
+    state: GameState;
     spawn: () => void;
-    move: (direction: MoveKeys) => void;
     rotate: () => void;
+    move: (direction: Move) => void;
+    moveDown: () => void;
+    moveLeft: () => void;
+    moveRight: () => void;
 }>((set, get) => ({
-    board: createBoard(ROWS, COLS),
-    currentTetrominoe: undefined,
-    spawn: () => {
-        if (get().currentTetrominoe) return;
-
-        const tetrominoe = pickRandomTetrominoe(TETROMINOES);
-        tetrominoe.coords = localToGlobalCoords(tetrominoe.coords, SPAWN_IDX);
-
-        const newBoard = addTetrominoeToBoard(get().board, tetrominoe);
-
-        set({
-            board: newBoard,
-            currentTetrominoe: tetrominoe,
-        });
+    state: {
+        board: createBoard(ROWS, COLS),
+        currentTetrominoe: undefined,
     },
-    move: (direction: MoveKeys) => {
-        const currentTetrominoe = get().currentTetrominoe;
-        if (!currentTetrominoe) return;
+    spawn: () => {
+        const { currentTetrominoe } = get().state;
+        if (currentTetrominoe) return;
 
-        const movedTetrominoe = { ...currentTetrominoe };
-        movedTetrominoe.coords = moveTetronoe(
-            direction,
-            movedTetrominoe.coords
-        );
+        const tetrominoe = getRandomTetrominoeInPos(START_POSITION, validate);
 
-        const newBoard = addTetrominoeToBoard(
-            createBoard(ROWS, COLS),
-            movedTetrominoe
-        );
+        if (!tetrominoe) return;
+
+        const newBoard = getUpdatedBoard(tetrominoe);
+
         set({
-            board: newBoard,
-            currentTetrominoe: movedTetrominoe,
+            state: {
+                ...get().state,
+                board: newBoard,
+                currentTetrominoe: tetrominoe,
+            },
         });
     },
     rotate: () => {
-        const currentTetrominoe = get().currentTetrominoe;
+        const { currentTetrominoe } = get().state;
         if (!currentTetrominoe) return;
 
-        const rotatedTetrominoe = { ...currentTetrominoe };
-        rotatedTetrominoe.currentCoords =
-            (rotatedTetrominoe.currentCoords + 1) %
-            rotatedTetrominoe.coords.length;
-
-        const newBoard = addTetrominoeToBoard(
-            createBoard(ROWS, COLS),
-            rotatedTetrominoe
+        const rotatedTetrominoe = getRotatedTetrominoe(
+            currentTetrominoe,
+            validate
         );
+
+        if (!rotatedTetrominoe) return;
+
+        const newBoard = getUpdatedBoard(rotatedTetrominoe);
+
         set({
-            board: newBoard,
-            currentTetrominoe: rotatedTetrominoe,
+            state: {
+                ...get().state,
+                board: newBoard,
+                currentTetrominoe: rotatedTetrominoe,
+            },
         });
+    },
+    move: (direction: Move) => {
+        const { currentTetrominoe } = get().state;
+        if (!currentTetrominoe) return;
+
+        const movedTetrominoe = getMovedTetrominoe(
+            currentTetrominoe,
+            direction,
+            validate
+        );
+
+        if (!movedTetrominoe) return;
+
+        const newBoard = getUpdatedBoard(movedTetrominoe);
+
+        set({
+            state: {
+                ...get().state,
+                board: newBoard,
+                currentTetrominoe: movedTetrominoe,
+            },
+        });
+    },
+    moveDown: () => {
+        get().move(DIRECTION.DOWN);
+    },
+    moveLeft: () => {
+        get().move(DIRECTION.LEFT);
+    },
+    moveRight: () => {
+        get().move(DIRECTION.RIGHT);
     },
 }));

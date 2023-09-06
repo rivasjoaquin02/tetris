@@ -1,9 +1,7 @@
-import { Color } from "../types";
-
-type Coord = [number, number];
+import { Color, Coords } from "../types";
 
 export type Tetrominoe = {
-    coords: Array<Array<Coord>>;
+    coords: Coords;
     currentCoords: number;
     color: Color;
 };
