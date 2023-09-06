@@ -1,0 +1,27 @@
+:root {
+    --gap: 5px;
+    --cell-size: 30px;
+    --cell-radius: 4px;
+}
+
+.board {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+}
+
+.board__row {
+    display: flex;
+    gap: var(--gap);
+}
+
+.board__cell {
+    background: var(--background-alt);
+    width: var(--cell-size);
+    height: var(--cell-size);
+
+    border-radius: var(--cell-radius);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+
+    cursor: pointer;
+}

@@ -1,0 +1,32 @@
+
+:root {
+    --gap: 5px;
+    --cell-size: 30px;
+    --cell-radius: 4px;
+}
+
+.creator {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+}
+
+.creator__row {
+    display: flex;
+    gap: var(--gap);
+}
+
+.creator__cell {
+    width: var(--cell-size);
+    height: var(--cell-size);
+
+    border-radius: var(--cell-radius);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+
+    cursor: pointer;
+}
+
+.creator__cell button {
+    padding: 0;
+    margin: 0;
+}
