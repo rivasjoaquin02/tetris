@@ -6,7 +6,7 @@ export type Tetrominoe = {
     color: Color;
 };
 
-export const TETROMINOES: Array<Tetrominoe> = [
+export const TETROMINOES: Tetrominoe[] = [
     {
         coords: [
             [
