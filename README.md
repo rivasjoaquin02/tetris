@@ -9,7 +9,7 @@ Simple Tetris that I made that uses `zustand`
 
 ![Main](screenshots/main.png)
 
-<video src="screenshots/tetris.mp4" controls title="Title" height="400"></video>
+<video src="screenshots/tetris.mp4" controls title="Title" height="400" />
 
 ## Features
 
