@@ -9,7 +9,9 @@ Simple Tetris that I made that uses `zustand`
 
 ![Main](screenshots/main.png)
 
-<video src="screenshots/tetris.mp4" controls title="Title" height="400" />
+
+
+https://github.com/rivasjoaquin02/tetris/assets/38800238/f0e9609d-ed86-4c43-9b01-79fb6f1557f9
 
 ## Features
 
