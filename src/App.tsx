@@ -1,15 +1,14 @@
 import { useEffect, useRef } from "react";
-import { useGame } from "./store/store";
+import { useGameStore } from "./store/store";
 
 import Board from "./components/board/Board";
-// import Creator from "./components/creator/Creator";
 
 function App() {
-    const spawn = useGame((s) => s.spawn);
-    const moveDown = useGame((s) => s.moveDown);
-    const moveLeft = useGame((s) => s.moveLeft);
-    const moveRight = useGame((s) => s.moveRight);
-    const rotate = useGame((s) => s.rotate);
+    const spawn = useGameStore((state) => state.spawn);
+    const moveDown = useGameStore((state) => state.moveDown);
+    const moveLeft = useGameStore((state) => state.moveLeft);
+    const moveRight = useGameStore((state) => state.moveRight);
+    const rotate = useGameStore((state) => state.rotate);
 
     const intervalId = useRef<number>();
 
@@ -40,7 +39,6 @@ function App() {
             </button>
 
             <Board />
-            {/* <Creator /> */}
         </div>
     );
 }

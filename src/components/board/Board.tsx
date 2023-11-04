@@ -1,4 +1,4 @@
-import { useGame } from "../../store/store";
+import { useGameStore } from "../../store/store";
 import { Color } from "../../types";
 
 import "./board.css";
@@ -19,7 +19,7 @@ function BoardRow({ cells }: { cells: Array<string> }) {
 }
 
 function Board() {
-    const { board } = useGame((s) => s.state);
+    const board = useGameStore((state) => state.board);
 
     return (
         <div className="board">
